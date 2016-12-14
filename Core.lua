@@ -348,7 +348,9 @@ function PityMe:IsLegendaryEnabledBoss(boss_id)
 	    return true
 	  end
 	end
-
+	if debug then 
+	  		Print(boss_id .. "is not a legendary enabled mob");
+	  	end
 	return false
 
 end
