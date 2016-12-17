@@ -1,15 +1,13 @@
 ---------------------------------------------------------------
 --------           DEBUG                      -----------------
 ---------------------------------------------------------------
-local debug = false;
+local debug = true;
 ---------------------------------------------------------------
 ---------------------------------------------------------------
 ---------------------------------------------------------------
 SLASH_PityMe1 = "/pityme"
 SlashCmdList.PityMe = function()
-self:Print("TEST")
 	PityMe:SetupGUI();
-	
 end
 
 
@@ -87,9 +85,7 @@ function PityMe:CHAT_MSG_LOOT(...)
 	local _, _, lootedItem = string.find(message, '(|.+|r)')
 	local name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice = GetItemInfo(lootedItem)
 
-	self:Print(looter);
-
-	if looter != GetUnitName("player") then
+	if looter ~= GetUnitName("player") then
 		if debug then
 			self:Print("This item is not for the current player");
 		end
@@ -346,19 +342,20 @@ function PityMe:IsLegendaryEnabledBoss(boss_id)
           94960,95833,95674,95675,95676,--halls of valor
           91784,91789,91797,91808,96028,--eye of azshara
           96512,103344,99200,101403,--darkheart thicket
-          114262,114328,114261,114284,114251,113971,114312,114247,114895,114350,116494,114790--karazhan
+          114262,114328,114261,114284,114251,113971,114312,114247,114895,114350,116494,114790,--karazhan
+          61658, 61657 --test
         }
 
 	for _,v in pairs(bosses) do
 	  if v == boss_id then
 	  	if debug then 
-	  		Print("This is a legendary enabled boss");
+	  		self:Print("This is a legendary enabled boss");
 	  	end
 	    return true
 	  end
 	end
 	if debug then 
-	  		Print(boss_id .. "is not a legendary enabled mob");
+	  		self:Print(boss_id .. "is not a legendary enabled mob");
 	  	end
 	return false
 
@@ -454,8 +451,9 @@ end
 
 --function to push the legendary event with all details to others in your guild
 function PityMe:ShareData(type, eventData)
-
-	SendAddonMessage(type, eventData, "GUILD");
+	if IsInGuild() then 
+		SendAddonMessage(type, eventData, "GUILD");
+	end
 
 end
 
