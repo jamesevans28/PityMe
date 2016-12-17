@@ -5,8 +5,9 @@ local debug = false;
 ---------------------------------------------------------------
 ---------------------------------------------------------------
 ---------------------------------------------------------------
-SLASH_PityMe1 = "/luck"
+SLASH_PityMe1 = "/pityme"
 SlashCmdList.PityMe = function()
+self:Print("TEST")
 	PityMe:SetupGUI();
 	
 end
@@ -40,8 +41,7 @@ function PityMe:OnInitialize()
     end
 
    local arg1, arg2, diff = GetInstanceInfo()
-	self:Print(diff);
-	
+		
 	--PityMe:SetupGUI();
 end
 
@@ -86,6 +86,15 @@ function PityMe:CHAT_MSG_LOOT(...)
 	local event, message, _, _, _, looter = ...
 	local _, _, lootedItem = string.find(message, '(|.+|r)')
 	local name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice = GetItemInfo(lootedItem)
+
+	self:Print(looter);
+
+	if looter != GetUnitName("player") then
+		if debug then
+			self:Print("This item is not for the current player");
+		end
+		return
+	end
 
 	if quality == 5 then
 		self:Print("WOO! Legendary!")
@@ -246,7 +255,7 @@ function PityMe:PrintCountWelcomeMessage()
 
 	 total = PityMe:GetTotalChances()
 	 self:Print("Been " .. total .. " chances since your last legendary. Good luck!")
-	 self:Print("Type /luck to bring up your guild list. They must have addon to show")
+	 self:Print("Type /pityme to bring up your guild list. They must have addon to show")
 end
 
 

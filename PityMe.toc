@@ -1,7 +1,7 @@
 ## Interface: 70100
 ## Title: PityMe
 ## Author: Chub
-## Version: 0.94
+## Version: 0.96
 ## Notes: Counts your total chances took to get a legendary
 ## SavedVariablesPerCharacter: chance_counts
 ## SavedVariables: PityMeDB
