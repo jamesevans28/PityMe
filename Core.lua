@@ -1,28 +1,54 @@
+PityMe = LibStub("AceAddon-3.0"):NewAddon("PityMe", "AceConsole-3.0", "AceEvent-3.0")
+
 ---------------------------------------------------------------
 --------           DEBUG                      -----------------
 ---------------------------------------------------------------
-local debug = true;
+local debug = false;
+PityMe.debug = false;
 ---------------------------------------------------------------
 ---------------------------------------------------------------
 ---------------------------------------------------------------
-SLASH_PityMe1 = "/pityme"
-SlashCmdList.PityMe = function()
-	PityMe:SetupGUI();
+
+function PityMe:SlashCommands(input)
+
+	input = string.lower(input)
+
+	if input == "guild" then
+		PityMe:SetupGUI();
+	elseif input == "log" then
+		PityMe:MyCurrentChancesGUI();
+	elseif input == "debug" then
+		
+		PityMe.debug = not PityMe.debug;
+		debug = not debug;
+		if PityMe.debug then
+			self:Print("Setting debug to ON")
+		else
+			self:Print("Setting debug to OFF")
+		end
+
+	elseif input == "reset" then
+		self:Print("Resetting all current counts");
+		PityMe:ResetCounts();
+	else
+		self:Print("Welcome to PityMe Legendary Chance Tracker.")
+		self:Print("Usage:")
+		self:Print("Current guild chances: /pityme guild")
+		self:Print("Your log of legendaries: /pityme log")
+		self:Print("Toggle debug mode: /pityme debug")
+	end 
+
 end
 
 
 
-
-PityMe = LibStub("AceAddon-3.0"):NewAddon("PityMe", "AceConsole-3.0", "AceEvent-3.0")
 
 
 
 
 
 function PityMe:OnInitialize()
-
-    -- Called when the addon is loaded
-    self:Print(PityMe:PrintCountWelcomeMessage());
+	
     
      if PityMeDB == nil then
     	if debug then
@@ -40,7 +66,10 @@ function PityMe:OnInitialize()
 
    local arg1, arg2, diff = GetInstanceInfo()
 		
+	self:Print(PityMe:PrintCountWelcomeMessage());
+	PityMe:ShareData("PityMeCHANCE", PityMe:FormatMyData());
 	--PityMe:SetupGUI();
+	PityMe:RegisterChatCommand('pityme', 'SlashCommands')
 end
 
 function PityMe:OnEnable()
@@ -51,9 +80,18 @@ function PityMe:OnEnable()
     self:RegisterEvent("QUEST_TURNED_IN");
     self:RegisterEvent("CHALLENGE_MODE_COMPLETED");
     self:RegisterEvent("CHAT_MSG_ADDON");
-
+    self:RegisterEvent("PLAYER_LOGIN");
 end
 
+
+function PityMe:PLAYER_LOGIN()
+
+	self:Print("Login");
+	 -- Called when the addon is loaded
+    self:Print(PityMe:PrintCountWelcomeMessage());
+	PityMe:ShareData("PityMeCHANCE", PityMe:FormatMyData());
+
+end
 
 function PityMe:PLAYER_REGEN_DISABLED()
 	if debug then
@@ -171,22 +209,7 @@ function PityMe:QUEST_TURNED_IN(timestamp, questId, arg3, arg4)
 
 end
 
---function to receive data shared
-function PityMe:CHAT_MSG_ADDON(prefix, msg, ...)
 
-	if prefix == "PityMeLOOT" then
-
-		PityMe:AddRecordToDBLog(msg);
-
-	end
-
-	if prefix == "PityMeCHANCE" then
-
-		PityMe:AddRecordToDBActive(msg);
-
-	end
-
-end
 
 
 -- Get the ID for the mob, given the guid
@@ -331,22 +354,7 @@ end
 
 function PityMe:IsLegendaryEnabledBoss(boss_id)
 
-	local bosses = {
-          98205,98203,98207,98206,98208, --arcway
-          104215,104217,104218, --court of stars
-          95884,96015,95886,95887,95888, -- vault of the wardens
-          96756,96754,96759, --maw of souls
-          98542,98696,98949,94923, --black rook hold
-          102617,102614,102615,102616,102618,102619,--violet hold
-          91003,91004,91005,91007,--neltharions lair
-          94960,95833,95674,95675,95676,--halls of valor
-          91784,91789,91797,91808,96028,--eye of azshara
-          96512,103344,99200,101403,--darkheart thicket
-          114262,114328,114261,114284,114251,113971,114312,114247,114895,114350,116494,114790,--karazhan
-          61658, 61657 --test
-        }
-
-	for _,v in pairs(bosses) do
+	for _,v in pairs(PityMe.bosses) do
 	  if v == boss_id then
 	  	if debug then 
 	  		self:Print("This is a legendary enabled boss");
@@ -364,98 +372,9 @@ end
 
 
 
-function PityMe:SetupGUI()
-	local AceGUI = LibStub("AceGUI-3.0")
-    local frame = AceGUI:Create("Frame")
-	 frame:SetTitle("Legendary Luck")
-	-- frame:SetStatusText("AceGUI-3.0 Example Container Frame")
-	 frame:SetLayout("Fill")
-
-	 frame:EnableResize(false)
-	--UIPanelWindows["oRA3Frame"] = { area = "left", pushable = 3, whileDead = 1, yoffset = 12, xoffset = -16 }
-	--HideUIPanel(oRA3Frame)
-
-	 frame:SetWidth(770)
-	 frame:ApplyStatus()
-	 frame:Hide();
-	-- frame:SetHeight(512)
 
 
-	local st_rowheight         = 16
-	local st_displayed_rows    = 25 --math.floor(366/st_rowheight)
-	local st_colwidth          = 80 --65
-	local cols = {
-		{
-			name = "Character",
-			width = 130,
-		},
-		{
-			name = "Daily Cache",
-			width = 70,
-			align="CENTER"
-		},
-		{
-			name = "Weekly Cache",
-			width = 80,
-			align="CENTER"
-		},
-		{
-			name = "Dungeon Boss",
-			width = 90,
-			align="CENTER"
-		},
-		{
-			name = "M+ Chest",
-			width = 75,
-			align="CENTER"
-		},
-		{
-			name = "Raid Boss",
-			width = 70,
-			align="CENTER"
-		},
-		{
-			name = "World Boss",
-			width = 70,
-			align="CENTER"
-		},
-		{
-			name = "Total",
-			width = 40,
-			align="CENTER"
-		}
-	}
 
-	
-
-	local ScrollingTable = LibStub("ScrollingTable");
-	local guildtable = ScrollingTable:CreateST(cols, st_displayed_rows, st_rowheight, --[[highlight=]]nil, frame.content);
-	
-	--local guildtable = ScrollingTable:CreateST(cols);
-	--frame:AddChild(guildtable)
-	guildtable.frame:SetPoint("TOPLEFT", frame.content, 0,-20);
-
-	local dataToShow = {};
-	for _,v in pairs(PityMeDB.active) do
-	 	table.insert(dataToShow,v)
-	 end
-
---	print(formatMyData())
-	table.insert(dataToShow, PityMe:FormatMyData())
-
-	guildtable:SetData(dataToShow, true);
-	--frame:AddChild( table.frame )
-
-	frame:Show();
-end
-
---function to push the legendary event with all details to others in your guild
-function PityMe:ShareData(type, eventData)
-	if IsInGuild() then 
-		SendAddonMessage(type, eventData, "GUILD");
-	end
-
-end
 
 
 
@@ -483,21 +402,7 @@ function PityMe:AddRecordToDBActive(data)
 
 end
 
-function PityMe:FormatMyData()
 
-	local formattedData = {
-				GetUnitName("player"), 
-				chance_counts.daily_chest ,
-			    chance_counts.weekly_chest, 
-			   	chance_counts.normal_dungeon .. "|" .. chance_counts.heroic_dungeon .. "|" .. chance_counts.mythic_dungeon,
-				chance_counts.mythic_plus_dungeon,
-				chance_counts.lfr_raid .. "|" .. chance_counts.normal_raid .. "|" .. chance_counts.heroic_raid .. "|" .. chance_counts.mythic_raid,
-				0,
-				PityMe:GetTotalChances()	
-				}
-	return formattedData;
-
-end
 
 --check how many chests you got at the end of the m+ dungeon
 function PityMe:CHALLENGE_MODE_COMPLETED()

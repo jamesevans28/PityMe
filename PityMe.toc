@@ -21,5 +21,10 @@ libs\lib-st\lib-st.xml
 #@end-no-lib-strip@
 
 embeds.xml
-AceGUIWidget-lib-st.lua
 Core.lua
+AceGUIWidget-lib-st.lua
+Constants.lua
+Gui.lua
+Comms.lua
+Helper.lua
+
