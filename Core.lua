@@ -30,11 +30,15 @@ function PityMe:SlashCommands(input)
 	elseif input == "reset" then
 		self:Print("Resetting all current counts");
 		PityMe:ResetCounts();
+	elseif input == "share" then
+		self:Print("Sharing Data with Guild");
+		PityMe:ShareData("PityMeCHANCE", PityMe:FormatMyData());
 	else
 		self:Print("Welcome to PityMe Legendary Chance Tracker.")
 		self:Print("Usage:")
 		self:Print("Current guild chances: /pityme guild")
 		self:Print("Your log of legendaries: /pityme log")
+		self:Print("Reset your current counts: /pityme reset")
 		self:Print("Toggle debug mode: /pityme debug")
 	end 
 
@@ -81,6 +85,9 @@ function PityMe:OnEnable()
     self:RegisterEvent("CHALLENGE_MODE_COMPLETED");
     self:RegisterEvent("CHAT_MSG_ADDON");
     self:RegisterEvent("PLAYER_LOGIN");
+
+    chance_ok = RegisterAddonMessagePrefix("PityMeCHANCE");
+    loot_ok = RegisterAddonMessagePrefix("PityMeLOOT");
 end
 
 
@@ -222,6 +229,7 @@ end
 
 -- reset all counts after getting a legendary, or setting up for the first time
 function PityMe:ResetCounts()
+	
 	self:Print("Resetting all counts")
 	chance_counts = {}
 	chance_counts.daily_chest = 0

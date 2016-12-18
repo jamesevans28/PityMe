@@ -2,7 +2,7 @@
 function PityMe:CHAT_MSG_ADDON(prefix, msg, ...)
 
 	if prefix == "PityMeLOOT" then
-		
+
 		PityMe:AddRecordToDBLog(msg);
 
 	end
@@ -20,7 +20,7 @@ end
 function PityMe:ShareData(type, eventData)
 
 	if IsInGuild() then 
-		self:Print("Sharing Data with guild (" .. type .. ")");
+		PityMe:print("Sharing Data with guild (" .. type .. ")");
 		SendAddonMessage(type, eventData, "GUILD");
 	end
 
