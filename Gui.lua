@@ -248,11 +248,11 @@ function PityMe:SetupGUI()
 
 	local dataToShow = {};
 	for _,v in pairs(PityMeDB.active) do
-	 	table.insert(dataToShow,v)
+	 	table.insert(dataToShow,PityMe:FormatForDisplay(v))
 	 end
 
 --	print(formatMyData())
-	table.insert(dataToShow, PityMe:FormatMyData())
+	--table.insert(dataToShow, PityMe:FormatMyData())
 
 	guildtable:SetData(dataToShow, true);
 	--frame:AddChild( table.frame )
@@ -263,17 +263,50 @@ end
 
 function PityMe:FormatMyData()
 
-	local formattedData = {
-				GetUnitName("player"), 
-				chance_counts.daily_chest ,
-			    chance_counts.weekly_chest, 
-			    tostring(chance_counts.normal_dungeon) .. "-" .. tostring(chance_counts.heroic_dungeon) .. "-" .. tostring(chance_counts.mythic_dungeon),
+	-- local formattedData = {
+	-- 			GetUnitName("player"), 
+	-- 			chance_counts.daily_chest ,
+	-- 		    chance_counts.weekly_chest, 
+	-- 		    tostring(chance_counts.normal_dungeon) .. "-" .. tostring(chance_counts.heroic_dungeon) .. "-" .. tostring(chance_counts.mythic_dungeon),
+	-- 			--tostring(chance_counts.heroic_dungeon).."-"..tostring(chance_counts.mythic_dungeon),
+	-- 			chance_counts.mythic_plus_dungeon,
+	-- 			chance_counts.lfr_raid .. "-" .. chance_counts.normal_raid .. "-" .. chance_counts.heroic_raid .. "-" .. chance_counts.mythic_raid,
+	-- 			0,
+	-- 			PityMe:GetTotalChances()	
+	-- 			}
+	local formattedData = {};
+	formattedData.playerName 	= GetUnitName("player"); 
+	formattedData.daily_chest	= chance_counts.daily_chest;
+	formattedData.weekly_chest	= chance_counts.weekly_chest; 
+	formattedData.normal_dungeon= chance_counts.normal_dungeon;
+	formattedData.heroic_dungeon= chance_counts.heroic_dungeon;
+	formattedData.mythic_dungeon= chance_counts.mythic_dungeon;
+	formattedData.mythic_plus_dungeon= chance_counts.mythic_plus_dungeon;
+	formattedData.lfr_raid		= chance_counts.lfr_raid;
+	formattedData.normal_raid	= chance_counts.normal_raid;
+	formattedData.heroic_raid	= chance_counts.heroic_raid;
+	formattedData.mythic_raid	= chance_counts.mythic_raid;
+	formattedData.world_bosses	= chance_counts.world_bosses;
+	formattedData.pvp			= chance_counts.pvp;
+	formattedData.total 		= PityMe:GetTotalChances();
+
+	return formattedData;
+
+end
+
+function PityMe:FormatForDisplay(data)
+local formattedData = {
+				data.playerName, 
+				data.daily_chest ,
+			    data.weekly_chest, 
+			    tostring(data.normal_dungeon) .. "-" .. tostring(data.heroic_dungeon) .. "-" .. tostring(data.mythic_dungeon),
 				--tostring(chance_counts.heroic_dungeon).."-"..tostring(chance_counts.mythic_dungeon),
-				chance_counts.mythic_plus_dungeon,
-				chance_counts.lfr_raid .. "-" .. chance_counts.normal_raid .. "-" .. chance_counts.heroic_raid .. "-" .. chance_counts.mythic_raid,
-				0,
-				PityMe:GetTotalChances()	
+				data.mythic_plus_dungeon,
+				data.lfr_raid .. "-" .. data.normal_raid .. "-" .. data.heroic_raid .. "-" .. data.mythic_raid,
+				data.world_bosses,
+				data.total	
 				}
+
 	return formattedData;
 
 end

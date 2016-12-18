@@ -1,10 +1,11 @@
-PityMe = LibStub("AceAddon-3.0"):NewAddon("PityMe", "AceConsole-3.0", "AceEvent-3.0")
+PityMe = LibStub("AceAddon-3.0"):NewAddon("PityMe", "AceConsole-3.0", "AceEvent-3.0","AceComm-3.0", "AceSerializer-3.0")
 
+ 
 ---------------------------------------------------------------
 --------           DEBUG                      -----------------
 ---------------------------------------------------------------
-local debug = false;
-PityMe.debug = false;
+local debug = true;
+PityMe.debug = true;
 ---------------------------------------------------------------
 ---------------------------------------------------------------
 ---------------------------------------------------------------
@@ -53,8 +54,7 @@ end
 
 function PityMe:OnInitialize()
 	
-    
-     if PityMeDB == nil then
+	if PityMeDB == nil then
     	if debug then
     		self:Print("Resetting PityMeDB");
     	end
@@ -68,10 +68,17 @@ function PityMe:OnInitialize()
     	PityMe:ResetCounts()
     end
 
+    if chance_counts.world_bosses == nil then
+    	chance_counts.world_bosses = 0
+    end
+
+    if chance_counts.pvp == nil then
+    	chance_counts.pvp = 0
+    end
+
    local arg1, arg2, diff = GetInstanceInfo()
 		
-	self:Print(PityMe:PrintCountWelcomeMessage());
-	PityMe:ShareData("PityMeCHANCE", PityMe:FormatMyData());
+	
 	--PityMe:SetupGUI();
 	PityMe:RegisterChatCommand('pityme', 'SlashCommands')
 end
@@ -86,14 +93,19 @@ function PityMe:OnEnable()
     self:RegisterEvent("CHAT_MSG_ADDON");
     self:RegisterEvent("PLAYER_LOGIN");
 
-    
+    self:RegisterComm("PityMeCHANCE", "PityMeCHANCE_Received");
+    self:RegisterComm("PityMeSYNC", "PityMeSYNC_Received");
+    self:RegisterComm("PityMeLOG", "PityMeLOG_Received");
+
+    self:Print(PityMe:PrintCountWelcomeMessage());
+	PityMe:ShareData("PityMeCHANCE", PityMe:FormatMyData());
 end
 
-function PityMe:PLAYER_ENTERING_WORLD()
-	chance_ok = RegisterAddonMessagePrefix("PityMeCHANCE");
-    loot_ok = RegisterAddonMessagePrefix("PityMeLOOT");
-    sync_ok = RegisterAddonMessagePrefix("PityMeSYNC"); 
-end
+-- function PityMe:PLAYER_ENTERING_WORLD()
+-- 	chance_ok = RegisterAddonMessagePrefix("PityMeCHANCE");
+--     loot_ok = RegisterAddonMessagePrefix("PityMeLOOT");
+--     sync_ok = RegisterAddonMessagePrefix("PityMeSYNC"); 
+-- end
 
 function PityMe:PLAYER_LOGIN()
 
@@ -183,19 +195,17 @@ function PityMe:COMBAT_LOG_EVENT_UNFILTERED(eventName, timeStamp, event, hideCas
 	-- end;
 
 	if string.match(event,"PARTY_KILL") then
-		if debug then
-			self:Print("Killed: " .. destName .. " with id: " .. PityMe:MobId(destGuid));
-		end
+		PityMe:print("Killed: " .. destName .. " with id: " .. PityMe:MobId(destGuid));
+		
 
-		if(PityMe:IsLegendaryEnabledBoss(PityMe:MobId(destGuid))) then
-			if debug then
-				self:Print("Legendary enabled boss!");
-			end
+		if PityMe:IsLegendaryEnabledBoss(PityMe:MobId(destGuid)) then
+			PityMe:print("Legendary enabled boss!");
 			PityMe:IncrementKillCounter()
+		elseif PityMe:IsWorldBoss(PityMe:MobId(destGuid)) then
+			PityMe:print("Legendary enabled boss!");
+			PityMe:IncrementWorldBossCounter()
 		else
-			if debug then
-				self:Print("Not a legendary enabled boss");	
-			end
+			PityMe:print("Not a legendary enabled boss");	
 		end
 		--PityMe:printCounts()
 	end;
@@ -246,6 +256,8 @@ function PityMe:ResetCounts()
 	chance_counts.normal_raid = 0
 	chance_counts.heroic_raid = 0
 	chance_counts.mythic_raid = 0
+	chance_counts.world_boss = 0
+	chance_counts.pvp = 0
 
 end
 
@@ -278,7 +290,9 @@ function PityMe:GetTotalChances()
 			 + chance_counts.lfr_raid 
 			 + chance_counts.normal_raid 
 			 + chance_counts.heroic_raid 
-			 + chance_counts.mythic_raid;
+			 + chance_counts.mythic_raid
+			 + chance_counts.world_bosses
+			 + chance_counts.pvp;
 	return total
 end
 
@@ -364,6 +378,20 @@ function PityMe:IncrementKillCounter()
 
 end
 
+function IncrementWorldBossCounter()
+	chance_counts.world_bosses = chance_counts.world_bosses + 1;
+end
+
+function PityMe:IsWorldBoss(boss_id)
+	for _,v in pairs(PityMe.world_bosses) do
+	  if v == boss_id then
+	  	PityMe:print("This is a legendary enabled world boss");
+	    return true
+	  end
+	end
+
+end
+
 function PityMe:IsLegendaryEnabledBoss(boss_id)
 
 	for _,v in pairs(PityMe.bosses) do
@@ -401,15 +429,19 @@ end
 function PityMe:AddRecordToDBActive(data)
 
 	--loop through local db and check if there is already a record in there with your current active chances
-	for _,v in pairs(PityMeDB.active) do
-	  if v[0] == data[0] then
-	    	v=data;
-
+	for a,b in pairs(PityMeDB.active) do
+		 
+	  if b.playerName == data.playerName then
+	    	 PityMeDB.active[a]=data;
+	    	 PityMe:print("Updating existing data");
 	    	return
 	    end
 	  end
 
+
+
 	 -- if no record exists then insert a new record
+	PityMe:print("Adding record to db")
 	table.insert(PityMeDB.active, data);
 
 end
