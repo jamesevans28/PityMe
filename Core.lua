@@ -86,10 +86,14 @@ function PityMe:OnEnable()
     self:RegisterEvent("CHAT_MSG_ADDON");
     self:RegisterEvent("PLAYER_LOGIN");
 
-    chance_ok = RegisterAddonMessagePrefix("PityMeCHANCE");
-    loot_ok = RegisterAddonMessagePrefix("PityMeLOOT");
+    
 end
 
+function PityMe:PLAYER_ENTERING_WORLD()
+	chance_ok = RegisterAddonMessagePrefix("PityMeCHANCE");
+    loot_ok = RegisterAddonMessagePrefix("PityMeLOOT");
+    sync_ok = RegisterAddonMessagePrefix("PityMeSYNC"); 
+end
 
 function PityMe:PLAYER_LOGIN()
 

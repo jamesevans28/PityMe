@@ -1,16 +1,23 @@
 --function to receive data shared
-function PityMe:CHAT_MSG_ADDON(prefix, msg, ...)
+function PityMe:CHAT_MSG_ADDON(prefix, msg, channel, sender)
 
 	if prefix == "PityMeLOOT" then
-
+		PityMe:print("Receiving LOOT data from " .. sender);
 		PityMe:AddRecordToDBLog(msg);
 
 	end
 
 	if prefix == "PityMeCHANCE" then
+		PityMe:print("Receiving CHANCE data from " .. sender);
+		PityMe:print(msg);
 
 		PityMe:AddRecordToDBActive(msg);
+		PityMe:ShareData("PityMeSYNC", PityMe:FormatMyData());
+	end
 
+	if prefix == "PityMeSYNC" then
+		PityMe:print("Receiving SYNC data from " .. sender);
+		PityMe:AddRecordToDBActive(msg);
 	end
 
 end
