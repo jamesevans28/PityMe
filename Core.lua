@@ -158,10 +158,10 @@ function PityMe:CHAT_MSG_LOOT(...)
 		self:Print("Took this many chances to get that legendary")
 		PityMe:PrintCounts()
 		--add current count to log
-		AddRecordToDBLog(PityMe:FormatMyData());
+		PityMe:AddRecordToDBLog(PityMe:FormatMyData());
 		PityMe:ShareData("PityMeLOOT", FormatMyData());
 		--reset current count
-		ResetCounts();
+		PityMe:ResetCounts();
 	end
 
 	--if we are getting a keystone, it means we may have picked up our weekly chest. 
