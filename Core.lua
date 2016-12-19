@@ -218,7 +218,7 @@ end
 function PityMe:QUEST_TURNED_IN(timestamp, questId, arg3, arg4)
 
 	if questId == 42421 --nightfallen
-		or questId == 42233 --highmountain
+		or questId == 42234 --highmountain
 		or questId == 42420 --court of farondis
 		or questId == 42422 --wardens
 		or questId == 42170 --dreamweavers
@@ -256,7 +256,7 @@ function PityMe:ResetCounts()
 	chance_counts.normal_raid = 0
 	chance_counts.heroic_raid = 0
 	chance_counts.mythic_raid = 0
-	chance_counts.world_boss = 0
+	chance_counts.world_bosses = 0
 	chance_counts.pvp = 0
 
 end

@@ -64,10 +64,22 @@ end
 --function to push the legendary event with all details to others in your guild
 function PityMe:ShareData(type, eventData)
 
+	PityMe:AddRecordToDBActive(eventData);
+
 	if IsInGuild() then 
 		PityMe:print("Sharing Data with guild (" .. type .. ")");
 		eventData = self:Serialize(eventData)
 		SendAddonMessage(type, eventData, "GUILD");
 	end
+
+end
+
+function PityMe:SendUpdateToGuildChat()
+
+	PityMe:print("Sending message to guild");
+
+	local message = "It's been " .. PityMe:GetTotalChances() .. " chances since my last legendary. Data captured by PityMe Addon";
+
+	SendChatMessage(message,"SAY", nil)
 
 end

@@ -158,20 +158,32 @@ function PityMe:MyCurrentChancesGUI()
 	desc:SetFullWidth(false)
 	RaidBossesGroup:AddChild(desc)
 	
-
-
-
+	
 
 	--Add all containers to frame
 	frame:AddChild(DailyQuestGroup);
 	frame:AddChild(DungeonBossesGroup);
 	frame:AddChild(RaidBossesGroup);
-
-
+	
+	if IsInGuild() then
+		local button = AceGUI:Create("Button")
+		button:SetText("Share data with guild")
+		button:SetCallback("OnClick", SendUpdateToGuildChat)
+		button:SetFullWidth(true)
+		frame:AddChild(button);
+	end 
 
 end
 
+function SendUpdateToGuildChat()
 
+	PityMe:print("Sending message to guild");
+
+	local message = "It's been " .. PityMe:GetTotalChances() .. " chances since my last legendary. Data captured by PityMe Addon";
+
+	SendChatMessage(message,"GUILD", nil)
+
+end
 
 
 
