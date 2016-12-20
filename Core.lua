@@ -159,7 +159,7 @@ function PityMe:CHAT_MSG_LOOT(...)
 		PityMe:PrintCounts()
 		--add current count to log
 		PityMe:AddRecordToDBLog(PityMe:FormatMyData());
-		PityMe:ShareData("PityMeLOOT", FormatMyData());
+		PityMe:ShareData("PityMeLOOT", PityMe:FormatMyData());
 		--reset current count
 		PityMe:ResetCounts();
 	end
