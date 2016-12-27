@@ -153,7 +153,7 @@ function PityMe:CHAT_MSG_LOOT(...)
 		return
 	end
 
-	if quality == 5 then
+	if quality == 5 and iLevel > 895 then
 		self:Print("WOO! Legendary!")
 		self:Print("Took this many chances to get that legendary")
 		PityMe:PrintCounts()
